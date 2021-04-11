@@ -6,7 +6,6 @@ import { Configuration } from "@/models/configuration";
 
 import RadarChart from "@/components/charts/radar.vue";
 import StructureChart from "@/components/charts/structure.vue";
-import StructureDiagram from "@/components/charts/structure-diagram.vue";
 
 /**
  * Configuration panel showing details of the selected configuration
@@ -17,8 +16,7 @@ import StructureDiagram from "@/components/charts/structure-diagram.vue";
 @Component({
   components: {
     RadarChart,
-    StructureChart,
-    StructureDiagram
+    StructureChart
   }
 })
 export default class ConfigurationBox extends Vue {

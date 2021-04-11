@@ -21,7 +21,6 @@
       </b-tab>
       <b-tab title="Structure" v-if="configuration.structure.components.length > 0" key="1" class="tab-style p-0">
           <structure-chart :data="configuration" :height="(350 + (46 * attributes.length)).toPrecision(3)"/>
-          <!--<structure-diagram :data="configuration" :height="(350 + (46 * attributes.length)).toPrecision(3)"></structure-diagram>-->
       </b-tab>
       <b-tab v-for="(block, i) in content" :key="`k-` + i" :title="block.title" no-body class="tab-style mb-3">
         <b-embed v-if="block.type == 0" type="iframe" :src="`data:text/html;charset=utf-8,` + block.value"></b-embed>
