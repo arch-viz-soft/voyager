@@ -5,7 +5,6 @@ import draggable from "vuedraggable";
 
 import { Attribute } from "@/models/attribute";
 import { Configuration } from "@/models/configuration";
-import { Report } from "@/models/report";
 
 import { Optimality } from "@/utils/optimality";
 import DataManagement from "@/utils/data-management";
@@ -188,7 +187,7 @@ export default class SolutionExplorerComponent extends Vue {
   // List of pareto optimal configurations
   public paretoFront: string[] = [];
   // Selected configuration from list
-  public selectedConfiguration: Configuration | null = null;
+  public selectedConfigurations: Configuration[] = [];
   // Flag indicating is user is currently reordering filter list
   public isReorderingFilters: boolean = false;
 
@@ -209,7 +208,7 @@ export default class SolutionExplorerComponent extends Vue {
    * @memberof SolutionExplorerComponent
    */
   public loadFilters() {
-    this.selectedConfiguration = null;
+    this.selectedConfigurations = [];
     this.filters = _.clone(this.$store.getters.attributes);
     this.sortFilters();
   }

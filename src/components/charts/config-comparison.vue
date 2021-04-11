@@ -22,9 +22,7 @@
 <script lang="ts">
 import { Prop, Component, Vue } from "vue-property-decorator";
 import { Attribute } from "@/models/attribute";
-import { Section } from "@/models/report";
-import { Configuration } from "@/models/configuration";
-import { ChartType, ChartData } from "@/models/chart-data";
+import { Configuration, Element } from "@/models/configuration";
 
 import "./charts.css";
 
@@ -46,7 +44,6 @@ export default class ConfigComparison extends Vue {
     return this.$store.getters.attributes;
   }
 
-
   /**
    * Getter for chartData object in echarts format
    */
@@ -57,24 +54,24 @@ export default class ConfigComparison extends Vue {
     }
     configurations = configurations.filter((c) => !!c);
 
-    let allComponents: string[] = [];
+    let allComponents: Element[] = [];
     const allAttributes: Attribute[] = this.attributes
       .filter((a) => a.isFiltered)
       .sort((a, b) => a.friendlyName.localeCompare(b.friendlyName));
 
     configurations.forEach((config: Configuration) => {
       config.structure.components.forEach((c) => {
-        if (!allComponents.includes(c)) { allComponents.push(c); }
+        if (!allComponents.filter((e) => e.name === c.name)) { allComponents.push(c); }
       });
     });
-    allComponents = allComponents.sort((a, b) => a.localeCompare(b));
+    allComponents = allComponents.sort((a, b) => a.name.localeCompare(b.name));
 
     const res = configurations.map((config: Configuration) => {
       const r: any = {
         configuration: config.id
       };
-      allComponents.map((c: string) => {
-        r[c] = !!config.structure.components.includes(c);
+      allComponents.map((c: Element) => {
+        r[c.name] = !!config.structure.components.filter((e) => e.name === c.name);
       });
       allAttributes.forEach((attr) => {
         r[attr.key] = config.attributes[attr.key];
@@ -85,13 +82,13 @@ export default class ConfigComparison extends Vue {
     const fields: any[] = [
       { key: "configuration", sortable: true }
     ];
-    allComponents.forEach((c: string) => {
-      const anyTrue = res.find((r) => r[c] === true);
-      const anyFalse = res.find((r) => r[c] === false);
+    allComponents.forEach((c: Element) => {
+      const anyTrue = res.find((r) => r[c.name] === true);
+      const anyFalse = res.find((r) => r[c.name] === false);
       if (this.showDifferencesOnly && anyTrue && anyFalse) {
-        fields.push({ key: c, sortable: true });
+        fields.push({ key: c.name, sortable: true });
       } else if (!this.showDifferencesOnly) {
-        fields.push({ key: c, sortable: true });
+        fields.push({ key: c.name, sortable: true });
       }
     });
     allAttributes.forEach((c: Attribute) => fields.push({

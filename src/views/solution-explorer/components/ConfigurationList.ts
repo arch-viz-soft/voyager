@@ -14,13 +14,6 @@ import { Attribute } from "@/models/attribute";
 @Component
 export default class ConfigurationList extends Vue {
   /**
-   * Currently selected configuration
-   * @type {Configuration}
-   * @memberof ConfigurationList
-   */
-  @Prop(Object) public readonly selectedConfiguration!: Configuration;
-
-  /**
    * List of configurations to display
    * Seperated into true (when pareto optimal) and false lists
    * @type {{ true: Configuration[], false: Configuration[] }}
@@ -36,11 +29,36 @@ export default class ConfigurationList extends Vue {
   @Prop(Array) public readonly filters!: Attribute[];
 
   /**
+   * Currently selected configurations
+   * @type {Configuration}
+   * @memberof ConfigurationList
+   */
+  @Prop(Array) public selectedConfigurations!: Configuration[];
+
+  /**
    * Event handler when user selects a configuration
    * @param {Configuration} c Selected configuration
    * @memberof ConfigurationList
    */
   public selectConfiguration(c: Configuration) {
-    this.$emit("select", c);
+    let appendConfig: boolean = true;
+    for (let i = 0; i < this.selectedConfigurations.length; i++) {
+      if (this.selectedConfigurations[i].id === c.id) {
+        this.selectedConfigurations.splice(i, 1);
+        appendConfig = false;
+      }
+    }
+    if (appendConfig) {
+      this.selectedConfigurations.push(c);
+    }
+    this.$emit("select", this.selectedConfigurations);
   }
+
+  public checkIfSelected(c: Configuration): boolean {
+    if (this.selectedConfigurations.some((config) => config.id === c.id)) {
+      return true;
+    }
+    return false;
+  }
+
 }

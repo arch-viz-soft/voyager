@@ -54,9 +54,9 @@ export default class RadarChart extends Vue {
     const configuration = this.data;
     const series: any[] = [];
 
-    this.data.forEach((c: Configuration) => {
+    this.data?.forEach((c: Configuration) => {
       const data: any[] = [];
-      this.attributes.forEach((a: Attribute) => {
+      this.attributes?.forEach((a: Attribute) => {
         data.push(c.attributes[a.key]);
       });
       series.push({

@@ -12,8 +12,9 @@
       <b-btn right size="sm" class="mr-3" variant="outline-secondary" @click="resetData">
         <i class="fa fa-fw fa-trash-alt mr-2"></i>Reset
       </b-btn>
-      <b-dropdown right size="sm" variant="outline-secondary" @click="api">
-        <b-dropdown-item v-b-modal.manage-extensions>Manage extensions</b-dropdown-item>
+      <b-dropdown right size="sm" variant="outline-secondary">
+        <b-dropdown-item v-b-modal.customise-components>Customise Components</b-dropdown-item>
+        <b-dropdown-item v-b-modal.manage-extensions @click="api">Manage extensions</b-dropdown-item>
       </b-dropdown>
       <b-form-file plain id="fileinput" ref="fileinput" v-model="files" multiple @change="uploadFile" accept=".json, .csv"/>
     </div>
@@ -31,6 +32,9 @@
 
       <p>Note: If you are connecting to <code>localhost</code>, you may need to enable cross-origin resource sharing (CORS) on your server.</p>
 
+    </b-modal>
+    <b-modal id="customise-components" title="Customise Components" size="lg" scrollable>
+      <customise-global-components></customise-global-components>
     </b-modal>
   </div>
 </template>

@@ -1,4 +1,5 @@
 import { Component, Vue } from "vue-property-decorator";
+import CustomiseGlobalComponents from "../../../components/customise-global-components/customise-global-components.vue";
 import _ from "lodash";
 import axios from "axios";
 
@@ -14,7 +15,11 @@ import { SettingsState } from "@/stores/settings";
  * @class Toolbar
  * @extends {Vue}
  */
-@Component
+@Component({
+  components: {
+    CustomiseGlobalComponents
+  }
+})
 export default class Toolbar extends Vue {
 
   // List of files selected by import dialog box

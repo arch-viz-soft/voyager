@@ -22,5 +22,5 @@ export default new Vuex.Store({
   },
   // Use createPersistedState to store data in localStorage across browser sessions
   plugins: [createPersistedState()],
-  strict: true
+  strict: false
 });

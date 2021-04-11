@@ -17,10 +17,7 @@
 
 <script lang="ts">
 import { Prop, Component, Vue, Watch } from "vue-property-decorator";
-import { Attribute } from "@/models/attribute";
-import { Section } from "@/models/report";
 import { Configuration } from "@/models/configuration";
-import { ChartType, ChartData } from "@/models/chart-data";
 
 import "./charts.css";
 
@@ -54,26 +51,21 @@ export default class ConfigStructures extends Vue {
   /**
    * Watch for changes to the input data
    */
-  @Watch("data")
+  @Watch("data", {deep: true})
   public onDataUpdate() {
     if (this.isUpdating) { return; }
     this.isUpdating = true;
-
-    // Update after 100ms to reduce number of expensive ui redraws
-    setTimeout(() => {
-      this.updateChartData();
-      this.isUpdating = false;
-    }, 250);
+    this.updateChartData();
+    this.isUpdating = false;
   }
 
   /**
    * Getter for chartData object in echarts format
    */
   public updateChartData() {
-
     const result = this.data.map((config: Configuration) => {
       const data = config.structure.components.map((c) => {
-        return { name: c, x: 300, y: 300 };
+        return { name: c.name, x: c.x_coordinate, y: c.y_coordinate, symbol: c.dataURI };
       });
 
       const links = config.structure.connections.map((c) => {
@@ -87,7 +79,6 @@ export default class ConfigStructures extends Vue {
           type: "graph",
           layout: "force",
           symbolSize: 35,
-          symbol: "circle",
           animation: false,
           focusNodeAdjacency: true,
           draggable: true,

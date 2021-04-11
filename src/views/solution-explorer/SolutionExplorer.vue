@@ -17,55 +17,59 @@
       <p class="mb-1 float-right"><small>Showing {{configurations.length}} of {{totalCount}}</small></p>
       <h5>Configurations</h5>
       <b-form-input type="text" placeholder="Search..." size="sm" v-model="searchQuery" autofocus name="search"></b-form-input>
-      <configuration-list :list="list" :filters="filters" :selectedConfiguration="selectedConfiguration" @select="selectedConfiguration=$event"/>
+      <configuration-list :list="list" :filters="filters" :selectedConfigurations="selectedConfigurations" @select="selectedConfigurations=$event"/>
     </div>
     <div class="solution-explorer-col s-col-3">
       <transition name="slide-fade">
-        <configuration v-if="selectedConfiguration" :configuration="selectedConfiguration" @clearSelection="selectedConfiguration = null"/>
+        <configuration v-if="selectedConfigurations.length == 1" :configuration="selectedConfigurations[0]" @clearSelection="selectedConfigurations = []"/>
       </transition>
 
-      <div v-if="chartDimensions > 0" v-show="!selectedConfiguration">
-        <h5 class="mb-3">Visualisations</h5>
+      <div v-show="selectedConfigurations.length > 1 || (selectedConfigurations.length == 0 && chartDimensions > 0)">
+        <div class="inline">
+          <h5 class="mb-3">Visualisations</h5>
+          <span class="mb-3 heading" v-if="selectedConfigurations.length == 0">  (Optimal Configurations)</span>
+          <span class="mb-3 heading" v-if="selectedConfigurations.length > 1">  (Selected Configurations)</span>
+        </div>
       
         <b-tabs content-class="mt-0" no-fade lazy :key="chartDimensions">
-          <b-tab title="Line" key="2" v-if="chartDimensions == 1">
+          <b-tab title="Line" key="2" v-if="chartDimensions == 1 && selectedConfigurations.length == 0">
             <chart-1d type="line" :data="chartData"/>
           </b-tab>
-          <b-tab title="Bar" key="3" v-if="chartDimensions == 1">
+          <b-tab title="Bar" key="3" v-if="chartDimensions == 1 && selectedConfigurations.length == 0">
             <chart-1d type="bar" :data="chartData"/>
           </b-tab>
-          <b-tab title="2D Scatter" key="4" v-if="chartDimensions >= 2 && chartDimensions < 5">
+          <b-tab title="2D Scatter" key="4" v-if="chartDimensions >= 2 && chartDimensions < 5 && selectedConfigurations.length == 0">
             <scatter-chart :data="chartData" />
           </b-tab>
-          <b-tab title="3D Scatter" key="5" v-if="chartDimensions >= 3 && chartDimensions <= 5">
+          <b-tab title="3D Scatter" key="5" v-if="chartDimensions >= 3 && chartDimensions <= 5 && selectedConfigurations.length == 0">
             <scatter3d-chart :key="chartDimensions" :data="chartData"/>
           </b-tab>
-          <b-tab title="Surface" key="6" v-if="chartDimensions == 3">
+          <b-tab title="Surface" key="6" v-if="chartDimensions == 3 && selectedConfigurations.length == 0">
             <surface-chart :data="chartData"/>
-          </b-tab>
-          <b-tab title="Map" key="7" v-if="chartDimensions == 3">
+          </b-tab> 
+          <b-tab title="Map" key="7" v-if="chartDimensions == 3 && selectedConfigurations.length == 0">
             <map-chart :data="chartData"/>
           </b-tab>
-          <b-tab title="Radar" key="8" v-if="!!list.true && list.true.length <= 8">
-            <radar-chart :data="list.true" />
+          <b-tab title="Radar" key="8" v-if="!!selectedConfigurations.length <= 8">
+            <radar-chart :data="selectedConfigurations.length > 0 ? selectedConfigurations : list.true" />
           </b-tab>
-          <b-tab title="Structures" key="9" v-if="!!list.true && list.true.length <= 12">
-            <config-structures :data="list.true" />
+          <b-tab title="Structures" key="9" v-if="!!selectedConfigurations.length <= 12">
+            <config-structures :data="selectedConfigurations.length > 0 ? selectedConfigurations : list.true" />
           </b-tab>
-          <b-tab title="Comparison" key="10">
+          <b-tab title="Comparison" key="10" v-if="selectedConfigurations.length == 0">
             <config-comparison :data="list" />
           </b-tab>
         </b-tabs>
       </div>
 
-      <div class="text-center" v-else-if="configurations.length > 0">
+      <div class="text-center" v-if="configurations.length > 0 && selectedConfigurations.length == 0 && chartDimensions == 0">
         <img class="mt-4" width="150px" src="@/assets/Logo.svg"/>
         <h4 class="mt-3">No attributes selected</h4>
         <p class="px-4">To visualise your solution space, select an attribute by ticking a checkbox in the left-hand column, or click on a configuration from the list. <br><br>
         For more guidance, see the <router-link to="/about">About</router-link> page.</p>
       </div>
 
-      <div class="text-center" v-else>
+      <div class="text-center" v-else-if="configurations.length == 0 && selectedConfigurations.length == 0">
         <img class="mt-4" width="150px" src="@/assets/Logo.svg"/>
         <h4 class="mt-3">Getting started</h4>
         <p class="px-4">To get started, import data into Voyager using the "Import" button in the top-right corner, or <a @click="loadDemoData" href="#">load some example data</a>.</p>
@@ -121,5 +125,16 @@
 }
 .handle {
   cursor: ns-resize;
+}
+.heading {
+  font-size: 13px;
+  color: #a8a8a8;
+  padding-left: 5px;
+}
+.inline {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  line-height: 30px;
 }
 </style>

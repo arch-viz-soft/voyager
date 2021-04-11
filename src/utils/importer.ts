@@ -213,10 +213,10 @@ export default class Importer {
     const configurations: Configuration[] = [];
     const index = configurations.findIndex((c: Configuration) => c.id === data.id);
     if (index >= 0) {
-      configurations[index].setGraph(data.graph);
+      configurations[index].setGraph(data.graph, data.subStructures, false);
     } else {
       const c = new Configuration({id: data.id});
-      c.setGraph(data.graph);
+      c.setGraph(data.graph, data.subStructures, false);
       configurations.push(c);
     }
     $store.commit("addConfigurations", configurations);

@@ -27,7 +27,7 @@ describe("Configuration", () => {
       { DS10: [{ WorkflowBinding: "TASWorkflow0" }]}
     ];
 
-    configuration.setGraph(graphData);
+    configuration.setGraph(graphData, null, false);
 
     expect(configuration.structure.components).to.be.length(4);
   });

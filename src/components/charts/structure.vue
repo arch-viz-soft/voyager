@@ -4,19 +4,25 @@
       <b-dropdown-item @click="exportChart">Export (.png)</b-dropdown-item>
       <b-dropdown-divider />
       <report-dropdown :section-index="this.sectionIndex" @addToReport="addToReport"/>
+      <b-dropdown-divider />
+      <b-dropdown-item v-b-modal.modal>Customise</b-dropdown-item>
     </b-dropdown>
+    <b-modal id="modal" scrollable size="lg" title="Customise Components">
+      <customise-individual-components :data="data"></customise-individual-components>
+    </b-modal>
     <e-chart :options="chartData" ref="chart" :init-options="{renderer: 'canvas'}" autoresize class="chart" :style="height ? 'height: ' + height + 'px' : ''" />
   </div>
 </template>
 
 <script lang="ts">
 import { Prop, Component, Vue } from "vue-property-decorator";
-import { ConfigurationStructure } from "@/models/configuration";
-import { ChartType, ChartData } from "@/models/chart-data";
+import { Configuration } from "@/models/configuration";
+import { ChartType } from "@/models/chart-data";
 import { Section } from "@/models/report";
-
+import { GetSubStructureTooltipContent } from "./tooltip";
+import { BIcon, BIconArrowsAngleExpand } from "bootstrap-vue";
 import ReportDropdown from "../ReportDropdown.vue";
-
+import CustomiseIndividualComponents from "../customise-individual-components/customise-individual-components.vue";
 import { ExportCanvas } from "./shared";
 
 import "./charts.css";
@@ -26,12 +32,15 @@ import "./charts.css";
  */
 @Component({
   components: {
-    ReportDropdown
+    ReportDropdown,
+    CustomiseIndividualComponents,
+    BIcon,
+    BIconArrowsAngleExpand
   }
 })
 export default class StructureChart extends Vue {
   // ChartData object, with all info required to render chart
-  @Prop(Object) public readonly data!: ConfigurationStructure;
+  @Prop(Object) public readonly data!: Configuration;
 
   // Height of the chart in pixels, optional
   @Prop(String) public readonly height!: string | undefined;
@@ -43,23 +52,23 @@ export default class StructureChart extends Vue {
    * Getter for chartData object in echarts format
    */
   get chartData() {
-
-    const data = this.data.components.map((c) => {
-      return { name: c, x: 300, y: 300 };
+    const data = this.data.structure.components.map((c) => {
+      return { name: c.name, x: c.x_coordinate, y: c.y_coordinate, symbol: c.dataURI, subStructure: c.subStructure };
     });
 
-    const links = this.data.connections.map((c) => {
+    const links = this.data.structure.connections.map((c) => {
       return { target: c.from, source: c.to, label: { formatter: c.label, show: true, fontSize: 10 } };
     });
 
     return {
-      tooltip: {},
+      tooltip: {
+        triggerOn: "click"
+      },
       series: [
         {
           type: "graph",
           layout: "force",
-          symbolSize: 40,
-          symbol: "circle",
+          symbolSize: 50,
           animation: false,
           focusNodeAdjacency: true,
           draggable: true,
@@ -97,7 +106,27 @@ export default class StructureChart extends Vue {
             normal: {
               opacity: 0.9,
               width: 2,
-              curveness: 0.2
+              curveness: 0.1
+            }
+          },
+          tooltip: {
+            show: true,
+            backgroundColor: "rgba(255,255,255,0.8)",
+            extraCssText: "width: 350px;overflow-y: hidden;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)",
+            position: (pos: any, params: any, dom: any, rect: any, size: any) => {
+              const obj: any = {top: 10};
+              obj[["left"][+(pos[0] < size.viewSize[0] / 2)]] = 5;
+              return obj;
+            },
+            borderColor: "#ddd",
+            borderWidth: 1,
+            textStyle: {
+              color: "#000"
+            },
+            padding: 8,
+            triggerOn: "click",
+            formatter: (params: any) => {
+              return GetSubStructureTooltipContent(params.data);
             }
           }
         }

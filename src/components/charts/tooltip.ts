@@ -1,7 +1,6 @@
 import echarts from "echarts";
-
 import { Attribute } from "@/models/attribute";
-import { ConfigurationStructure, Configuration } from "@/models/configuration";
+import { ConfigurationStructure, Configuration, Element } from "@/models/configuration";
 
 import "./charts.css";
 
@@ -11,35 +10,50 @@ import "./charts.css";
  * @param config Configuration object to show
  */
 export const GetTooltipContent = ($store: any, config: Configuration) => {
-    // Return content of tooltip as HTML
-    // Get attribute html content
-    let attrHtml = "";
-    $store.getters.attributes.forEach((a: Attribute) => {
-      attrHtml = `${attrHtml}<b>${a.friendlyName}</b>:<br>${config.attributes[a.key]}<br>`;
-    });
-    // Get structure chart html content
-    if (config.structure && config.structure.components.length > 0) {
-      setTimeout(() => {
-        // Load echart after delay to ensure it loads after its container has rendered
-        const structureChart = echarts.init(document.getElementById("tooltip-canvas"));
-        structureChart.setOption(getStructureChartData(config.structure));
-      }, 10);
-      return `<h5 class="mb-1">${config.id}</h5>` +
-        `<div id="tooltip-canvas" style="float: right; width: 150px; height:150px"></div>${attrHtml}`;
-    }
-    return `<h5 class="mb-1">${config.id}</h5>${attrHtml}`;
+  // Return content of tooltip as HTML
+  // Get attribute html content
+  let attrHtml = "";
+  $store.getters.attributes?.forEach((a: Attribute) => {
+    attrHtml = `${attrHtml}<b>${a.friendlyName}</b>:<br>${config.attributes[a.key]}<br>`;
+  });
+  // Get structure chart html content
+  if (config.structure && config.structure.components.length > 0) {
+    setTimeout(() => {
+      // Load echart after delay to ensure it loads after its container has rendered
+      const structureChart = echarts.init(document.getElementById("tooltip-canvas"));
+      structureChart.setOption(getStructureChartData(config.structure));
+    }, 10);
+    return `<h5 class="mb-1">${config.id}</h5>` +
+      `<div id="tooltip-canvas" style="float: right; width: 150px; height:150px"></div>${attrHtml}`;
+  }
+  return `<h5 class="mb-1">${config.id}</h5>${attrHtml}`;
+};
+
+export const GetSubStructureTooltipContent = (component: Element) => {
+  if (component.subStructure == null) {
+    return;
+  }
+  // Get structure chart html content
+  if (component.subStructure && component.subStructure.components.length > 0) {
+    setTimeout(() => {
+      // Load echart after delay to ensure it loads after its container has rendered
+      const structureChart = echarts.init(document.getElementById("tooltip-canvas"));
+      structureChart.setOption(getStructureChartData(component.subStructure));
+    }, 10);
+    return `<h5 class="mb-1">${component.name} sub-structure</h5>` +
+    `<div id="tooltip-canvas" style="width: 100%; height:250px"></div>`;
+  }
 };
 
 /**
  * Returns echarts object for structure chart
  */
-const getStructureChartData = (structure: ConfigurationStructure) => {
-
-  const data = structure.components.map((c) => {
-    return { name: c, x: 300, y: 300 };
+const getStructureChartData = (structure?: ConfigurationStructure) => {
+  const data = structure?.components.map((c) => {
+    return { name: c.name, x: c.x_coordinate, y: c.y_coordinate, symbol: c.dataURI };
   });
 
-  const links = structure.connections.map((c) => {
+  const links = structure?.connections.map((c) => {
     return { target: c.from, source: c.to, label: { formatter: c.label, show: false, fontSize: 10 } };
   });
 
@@ -50,7 +64,6 @@ const getStructureChartData = (structure: ConfigurationStructure) => {
         type: "graph",
         layout: "force",
         symbolSize: 20,
-        symbol: "circle",
         animation: false,
         focusNodeAdjacency: true,
         draggable: true,
@@ -78,7 +91,7 @@ const getStructureChartData = (structure: ConfigurationStructure) => {
           normal: {
             opacity: 0.9,
             width: 2,
-            curveness: 0.2
+            curveness: 0.1
           }
         }
       }
