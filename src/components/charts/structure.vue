@@ -5,11 +5,7 @@
       <b-dropdown-divider />
       <report-dropdown :section-index="this.sectionIndex" @addToReport="addToReport"/>
       <b-dropdown-divider />
-      <b-dropdown-item v-b-modal.modal>Customise</b-dropdown-item>
     </b-dropdown>
-    <b-modal id="modal" scrollable size="lg" title="Customise Components">
-      <customise-individual-components :data="data"></customise-individual-components>
-    </b-modal>
     <e-chart :options="chartData" ref="chart" :init-options="{renderer: 'canvas'}" autoresize class="chart" :style="height ? 'height: ' + height + 'px' : ''" />
   </div>
 </template>
@@ -20,9 +16,7 @@ import { Configuration } from "@/models/configuration";
 import { ChartType } from "@/models/chart-data";
 import { Section } from "@/models/report";
 import { GetSubStructureTooltipContent } from "./tooltip";
-import { BIcon, BIconArrowsAngleExpand } from "bootstrap-vue";
 import ReportDropdown from "../ReportDropdown.vue";
-import CustomiseIndividualComponents from "../customise-individual-components/customise-individual-components.vue";
 import { ExportCanvas } from "./shared";
 
 import "./charts.css";
@@ -32,10 +26,7 @@ import "./charts.css";
  */
 @Component({
   components: {
-    ReportDropdown,
-    CustomiseIndividualComponents,
-    BIcon,
-    BIconArrowsAngleExpand
+    ReportDropdown
   }
 })
 export default class StructureChart extends Vue {
