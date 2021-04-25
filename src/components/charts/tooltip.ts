@@ -76,6 +76,16 @@ const getStructureChartData = (structure?: ConfigurationStructure) => {
             }
           }
         },
+        edgeLabel: {
+          normal: {
+            position: "middle",
+            textStyle: {
+              fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',sans-serif",
+              color: "black",
+              fontSize: 20
+            }
+          }
+        },
         force: {
           initLayout: "force",
           edgeLength: 0.25,

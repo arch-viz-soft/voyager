@@ -51,8 +51,10 @@ describe("Utils: Importer", () => {
     const config1 = store.state.configurations.data.find((c: Configuration) => c.id === "config1");
     expect(config1).to.be.an("object");
     expect(config1).to.have.property("structure");
-    expect(config1.structure.components).to.include("MS10");
-    expect(config1.structure.components).to.include("TASWorkflow0");
+    expect(config1.structure.components[0].name).to.equal("TASWorkflow0");
+    expect(config1.structure.components[0].symbol).to.equal("rounded-rectangle.jpg");
+    expect(config1.structure.components[1].name).to.equal("MS10");
+    expect(config1.structure.components[1].symbol).to.equal("rounded-rectangle.jpg");
     expect(config1.structure.connections.length).to.equal(3);
   });
 
@@ -93,12 +95,77 @@ describe("Utils: Importer", () => {
     expect(store.state.configurations.data.length).to.equal(1);
 
     const config1 = store.state.configurations.data.find((c: Configuration) => c.id === "config1");
+
     expect(config1).to.be.an("object");
     expect(config1).to.have.property("attributes");
     expect(config1.attributes.cost).to.equal(10);
     expect(config1).to.have.property("structure");
-    expect(config1.structure.components).to.include("AS10");
-    expect(config1.structure.components).to.include("TASWorkflow0");
+    expect(config1.structure.components[0].name.toString()).to.equal("AS10");
+    expect(config1.structure.components[0].symbol).to.equal("rounded-rectangle.jpg");
+    expect(config1.structure.components[1].name.toString()).to.equal("TASWorkflow0");
+    expect(config1.structure.components[1].symbol).to.equal("rounded-rectangle.jpg");
+    expect(config1.structure.connections.length).to.equal(1);
+  });
+
+  it("Imports a configuration with one hierarchical sub-structure", () => {
+
+    const data: any = {
+      configurations: {
+        data: [{
+          id: "config1",
+          attributes: { cost: 10 },
+          structure: {
+            connections: [{ label: "WorkflowBinding", from: "AS10", to: "TASWorkflow0" }],
+            components: ["AS10", "TASWorkflow0"]
+          },
+          subStructures: [
+            {
+              TASWorkflow0: {
+                graph: [{
+                    structure: {
+                      connections: [{ label: "WorkflowBinding", from: "MS10", to: "DS20" }],
+                      components: ["MS10", "DS20"]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }]
+      },
+      attributes: {
+        data: [
+          {
+            key: "cost",
+            maxValue: 13.6,
+            minValue: 8.9,
+            scaleMax: 14,
+            scaleMin: 8,
+            isHigherBetter: false,
+            friendlyName: "Cost"
+          }
+        ]
+      },
+      reports: { data: [] }
+    };
+
+    // apply action
+    Importer.importFile(data, store);
+
+    // assert result
+    expect(store.state.attributes.data.length).to.equal(1);
+    expect(store.state.configurations.data.length).to.equal(1);
+
+    const config1 = store.state.configurations.data.find((c: Configuration) => c.id === "config1");
+
+    expect(config1).to.be.an("object");
+    expect(config1).to.have.property("attributes");
+    expect(config1.attributes.cost).to.equal(10);
+    expect(config1).to.have.property("structure");
+    expect(config1.structure.components[0].name.toString()).to.equal("AS10");
+    expect(config1.structure.components[0].symbol).to.equal("rounded-rectangle.jpg");
+    expect(config1.structure.components[1].name.toString()).to.equal("TASWorkflow0");
+    expect(config1.structure.components[1].symbol).to.equal("rounded-rectangle.jpg");
     expect(config1.structure.connections.length).to.equal(1);
   });
 });
