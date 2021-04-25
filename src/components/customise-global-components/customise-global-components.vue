@@ -48,6 +48,7 @@
     bottom: 4%;
     width: 100%;
     left: 0%;
+    color: black;
 }
 .symbol-button {
     width: 100%;
